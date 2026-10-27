@@ -15,4 +15,12 @@ DEMO:
 
 For technical information about the algorithm used please refer to the file `lib/analysis/analyze.dart`
 
+## Development notes
+
+- Builds with Flutter 3.47.8 and JDK 17 or newer; the Android SDK and NDK versions come from Flutter. CI builds the APK on every push: `.github/workflows/android-build.yml`.
+- Arabic notes on the current code and the plan for the dental lab order card:
+  - [docs/prep-report.md](docs/prep-report.md): audit, license questions, build results and open issues
+  - [docs/how-it-works.md](docs/how-it-works.md): screens, the shade matching algorithm and known bugs
+  - [docs/roadmap.md](docs/roadmap.md): Arabic UI, lab order card and PDF export
+
 ## License MIT

@@ -46,10 +46,11 @@ jobs:
       - name: Show APK details
         run: |
           apk=build/app/outputs/flutter-apk/app-release.apk
-          aapt2="$(ls -d "$ANDROID_HOME"/build-tools/*/ | sort -V | tail -1)aapt2"
+          build_tools="$(ls -d "$ANDROID_HOME"/build-tools/*/ | sort -V | tail -1)"
           ls -l "$apk"
-          "$aapt2" dump badging "$apk" | grep -E "^(package|minSdkVersion|sdkVersion|targetSdkVersion|application-label:|native-code)"
-          keytool -printcert -jarfile "$apk" | grep -E "Owner|SHA256:"
+          "${build_tools}aapt2" dump badging "$apk" | grep -E "^(package|minSdkVersion|sdkVersion|targetSdkVersion|application-label:|native-code)"
+          # minSdk 24 means v2+ signatures only, which keytool cannot read.
+          "${build_tools}apksigner" verify --print-certs "$apk" | grep -E "certificate (DN|SHA-256)"
           unzip -v "$apk" "lib/*"
 
       - uses: actions/upload-artifact@v5

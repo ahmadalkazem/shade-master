@@ -12,7 +12,7 @@
 | الكود على `Flutter 3.47.8` قبل التعديل | إعدادات `Gradle` أقدم من الحد الأدنى الذي يقبله `Flutter` |
 | بعد التعديل محلياً | التحليل بلا أخطاء، وثمانية اختبارات ناجحة، وترجمة كود `Dart` إلى ملف `ARM64` لأندرويد ناجحة |
 | بناء `APK` داخل الحاوية | متعذر: سياسة الشبكة تحجب `dl.google.com` الذي يُنزَّل منه `Android SDK` |
-| بناء `APK` على `GitHub Actions` | راجع قسم "نتيجة البناء على GitHub Actions" أدناه |
+| بناء `APK` على `GitHub Actions` | نجح: ملف `app-release.apk` بحجم 47 ميغابايت، `minSdk 24` و `targetSdk 36` |
 
 ## بنية المشروع
 
@@ -114,7 +114,17 @@ flutter test                       -> 8 tests passed
 flutter build apk --release        -> ✓ Built build/app/outputs/flutter-apk/app-release.apk (47.0MB)
 ```
 
-- استغرق `Gradle` ثلاث دقائق تقريباً، منها تنزيل `NDK 28.2` تلقائياً.
+تفاصيل الملف كما طبعها `aapt2` في التشغيل الثاني (https://github.com/ahmadalkazem/shade-master/actions/runs/40602144611):
+
+```text
+package: name='app.apexo.shadesmaster' versionCode='1' versionName='1.0.0' compileSdkVersion='36'
+minSdkVersion:'24'
+targetSdkVersion:'36'
+application-label:'shades'
+native-code: 'arm64-v8a' 'armeabi-v7a' 'x86_64'
+```
+
+- استغرق `Gradle` ثلاث إلى أربع دقائق، منها تنزيل `NDK 28.2` تلقائياً.
 - لم يطبع `Flutter` أي تحذير عن إصدارات `AGP` أو `Gradle` أو `Kotlin`.
 - الملف الناتج موقّع بمفتاح التصحيح الخاص بجهاز البناء، مثل إعداد المشروع الأصلي، فهو للتجربة فقط.
 - حجمه 47 ميغابايت مقابل 20 للنسخة القديمة. السبب المرجح أن `minSdk` صار 24، فيخزّن `AGP` المكتبات الأصلية بلا ضغط داخل الملف. الحجم بعد الضغط داخل `artifact` هو 22 ميغابايت تقريباً.
@@ -134,7 +144,8 @@ flutter build apk --release        -> ✓ Built build/app/outputs/flutter-apk/ap
 | `test/widget_test.dart` | استبدال اختبار العدّاد باختبار لشاشة الترحيب | الاختبار القديم لا علاقة له بالتطبيق وكان يفشل دائماً |
 | `test/comparison_test.dart` | اختبارات `deltaE` على بيانات Sharma المرجعية و `deltaGroups` | تثبيت صحة جزء المقارنة قبل أي تعديل |
 | `test/int_to_letter_test.dart` | اختبارات تسمية الألوان A و B و AA | نفس السبب |
-| `.github/workflows/android-build.yml` | سير عمل البناء | بناء `APK` فعلي خارج الحاوية |
+| `.github/workflows/android-build.yml` | سير عمل البناء، مع خطوة تطبع اسم الحزمة وإصدارات `SDK` والتوقيع | بناء `APK` فعلي خارج الحاوية |
+| `README.md` و `docs/` | قسم قصير للتطوير وثلاثة ملفات توثيق بالعربية | توثيق الفحص والخطة |
 
 لم يتغير أي ملف في `lib`. لم تتغير قيم `compileSdk` و `minSdk` و `targetSdk` في الملفات، لكنها تُقرأ من `Flutter`، فصارت فعلياً 36 و 24 و 36 بدلاً من 35 و 21 و 35. يعني ذلك أن الحد الأدنى صار أندرويد 7.0.
 
@@ -146,6 +157,6 @@ flutter build apk --release        -> ✓ Built build/app/outputs/flutter-apk/ap
 2. **الترخيص**: البنود الخمسة أعلاه.
 3. **بناء `APK` محلياً**: يحتاج السماح بالنطاق `dl.google.com` في إعدادات الشبكة للبيئة، أو الاعتماد على `GitHub Actions`.
 4. **توقيع الإصدار**: البناء الحالي يوقّع نسخة الإصدار بمفتاح التصحيح كما في الكود الأصلي. يلزم مفتاح خاص قبل النشر.
-5. **ملاحظات التحليل**: 18 اسم متغير لا يتبع نمط `lowerCamelCase` في `comparison.dart` (أسماء رياضية مقصودة)، و 6 استخدامات لـ `withOpacity` المهجورة. لا تمنع البناء.
+5. **ملاحظات التحليل**: 19 اسماً لا تتبع نمط `lowerCamelCase` في `comparison.dart` وهي رموز رياضية مقصودة، و 6 استخدامات للدالة المهجورة `withOpacity`. لا تمنع البناء.
 6. **منصات غير مختبرة**: `iOS` و `macOS` و `Linux` و `Windows`. التركيز على أندرويد حسب `README`.
 7. **ملف `APK` القديم في المستودع**: `release/app-release.apk` مبني من الكود الأصلي ويحمل الأخطاء نفسها. أبقيته كما هو. يُستحسن حذفه لاحقاً واستخدام إصدارات `GitHub Releases` بدلاً منه.

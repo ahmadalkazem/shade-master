@@ -39,7 +39,7 @@ jobs:
 
       - run: flutter --version
       - run: flutter pub get --enforce-lockfile
-      - run: flutter analyze --no-fatal-infos
+      - run: flutter analyze
       - run: flutter test
       - run: flutter build apk --release
 

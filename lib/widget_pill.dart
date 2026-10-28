@@ -30,7 +30,7 @@ class Pill extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.all(1),
               decoration: BoxDecoration(
-                color: c.withValues(blue: c.b + 30, red: c.r + 30, green: c.g + 30),
+                color: Color.lerp(c, Colors.white, 0.3),
                 borderRadius: BorderRadius.circular(3),
               ),
               child: const Icon(

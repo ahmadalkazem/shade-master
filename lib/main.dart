@@ -6,7 +6,12 @@ import 'package:shadesmaster/app/app_scope.dart';
 import 'package:shadesmaster/app/app_settings.dart';
 import 'package:shadesmaster/app/settings_page.dart';
 import 'package:shadesmaster/l10n/app_localizations.dart';
+import 'package:shadesmaster/orders/lab_order.dart';
+import 'package:shadesmaster/orders/order_details_page.dart';
+import 'package:shadesmaster/orders/order_form_page.dart';
 import 'package:shadesmaster/orders/order_repository.dart';
+import 'package:shadesmaster/orders/orders_page.dart';
+import 'package:shadesmaster/analysis/analyze.dart';
 import 'package:shadesmaster/widget_shade_master.dart';
 import 'package:shadesmaster/widget_primary_button.dart';
 
@@ -85,6 +90,19 @@ class _MainPageState extends State<MainPage> {
     });
   }
 
+  /// Opens the order form filled from the analysis, then the PDF of the saved order.
+  Future<void> createOrder(AnalysisResult result, Uint8List annotatedJpeg) async {
+    final defaults = AppScope.of(context).settings.defaults;
+    final draft = defaults.applyTo(
+      LabOrder.fromAnalysis(result, now: DateTime.now(), shadeGuide: defaults.shadeGuide),
+    );
+    final saved = await Navigator.of(context).push<LabOrder>(
+      MaterialPageRoute(builder: (_) => OrderFormPage(order: draft, photoJpeg: annotatedJpeg)),
+    );
+    if (saved == null || !mounted) return;
+    await Navigator.of(context).push(MaterialPageRoute(builder: (_) => OrderDetailsPage(order: saved)));
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -94,6 +112,11 @@ class _MainPageState extends State<MainPage> {
           : AppBar(
               title: Text(l10n.appTitle),
               actions: [
+                IconButton(
+                  tooltip: l10n.labOrders,
+                  icon: const Icon(Icons.assignment_outlined),
+                  onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const OrdersPage())),
+                ),
                 IconButton(
                   tooltip: l10n.settings,
                   icon: const Icon(Icons.settings_outlined),
@@ -106,6 +129,7 @@ class _MainPageState extends State<MainPage> {
             ? ShadeMaster(
                 img: imgPicked!,
                 onClose: closeImage,
+                onCreateOrder: createOrder,
               )
             : SingleChildScrollView(
                 padding: EdgeInsets.all(12),
@@ -160,6 +184,12 @@ class _MainPageState extends State<MainPage> {
               icon: Icons.folder,
             ),
           ],
+        ),
+        SizedBox(height: 16),
+        OutlinedButton.icon(
+          onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const OrdersPage())),
+          icon: const Icon(Icons.assignment_outlined),
+          label: Text(l10n.labOrders),
         ),
       ],
     );

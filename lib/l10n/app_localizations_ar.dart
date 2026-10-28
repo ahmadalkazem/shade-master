@@ -349,6 +349,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get pdfPhoto => 'الصورة مع المناطق المحللة';
 
   @override
+  String get patient => 'المريض';
+
+  @override
+  String get pdfTooth => 'السن';
+
+  @override
   String get pdfShade => 'اللون';
 
   @override

@@ -734,6 +734,18 @@ abstract class AppLocalizations {
   /// **'Photo with the analysed areas'**
   String get pdfPhoto;
 
+  /// No description provided for @patient.
+  ///
+  /// In en, this message translates to:
+  /// **'Patient'**
+  String get patient;
+
+  /// No description provided for @pdfTooth.
+  ///
+  /// In en, this message translates to:
+  /// **'Tooth'**
+  String get pdfTooth;
+
   /// No description provided for @pdfShade.
   ///
   /// In en, this message translates to:

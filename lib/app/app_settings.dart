@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/widgets.dart';
+import 'package:shadesmaster/orders/lab_order.dart';
 import 'package:shadesmaster/orders/shade_guide.dart';
 
 /// Values copied into every new lab order.
@@ -34,6 +35,17 @@ class OrderDefaults {
       clinicPhone: clinicPhone ?? this.clinicPhone,
       labName: labName ?? this.labName,
       shadeGuide: shadeGuide ?? this.shadeGuide,
+    );
+  }
+
+  /// Copies the clinic details and shade guide into a new order.
+  LabOrder applyTo(LabOrder order) {
+    return order.copyWith(
+      dentistName: dentistName,
+      clinicName: clinicName,
+      clinicPhone: clinicPhone,
+      labName: labName,
+      shadeGuide: shadeGuide,
     );
   }
 

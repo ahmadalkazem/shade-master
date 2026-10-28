@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -6,22 +7,29 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shadesmaster/analysis/analyze.dart';
 import 'package:shadesmaster/drawings.dart';
 import 'package:shadesmaster/l10n/app_localizations.dart';
+import 'package:shadesmaster/orders/annotated_photo.dart';
 import 'package:shadesmaster/utils/image_fit.dart';
 import 'package:shadesmaster/utils/int_to_letter.dart';
 import 'package:shadesmaster/utils/unit_8_img.dart';
 import 'package:shadesmaster/widget_pill.dart';
 import 'package:shadesmaster/widget_results_dialog.dart';
 import 'package:shadesmaster/widget_selection_painter.dart';
+import 'package:shadesmaster/widget_shade_name_picker.dart';
 import 'package:shadesmaster/widget_toolbar_button.dart';
 
 export 'package:shadesmaster/widget_selection_painter.dart' show SelectionType, teethColor, shadesColor;
 
+/// Called with the analysis and the photo annotated with the analysed areas
+/// (JPEG) when the dentist asks for a lab order from the results.
+typedef CreateOrderCallback = Future<void> Function(AnalysisResult result, Uint8List annotatedJpeg);
+
 class ShadeMaster extends StatefulWidget {
   final XFile img;
   final VoidCallback onClose;
+  final CreateOrderCallback? onCreateOrder;
   @override
   ShadeMasterState createState() => ShadeMasterState();
-  const ShadeMaster({super.key, required this.img, required this.onClose});
+  const ShadeMaster({super.key, required this.img, required this.onClose, this.onCreateOrder});
 }
 
 class ShadeMasterState extends State<ShadeMaster> {
@@ -202,6 +210,7 @@ class ShadeMasterState extends State<ShadeMaster> {
                                 label: _activeSelecting == SelectionType.teeth
                                     ? l10n.toothLabel(i + 1)
                                     : l10n.shadeLabel(e.shadeName ?? intToLetter(i + 1)),
+                                onTap: _activeSelecting == SelectionType.teeth ? null : () => _nameShade(e, i),
                                 color: _activeSelecting == SelectionType.teeth
                                     ? teethColor.shade100
                                     : shadesColor.shade100,
@@ -215,6 +224,11 @@ class ShadeMasterState extends State<ShadeMaster> {
                           ),
                         ),
                       ],
+                    ),
+                  if (_regions.isNotEmpty && _activeSelecting == SelectionType.shades)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 6),
+                      child: Text(l10n.nameShadeHint, style: TextStyle(fontSize: 12, color: Colors.black87)),
                     ),
                   if (_regions.isNotEmpty) SizedBox(height: 10),
                   // Scales the buttons down on narrow screens or with long labels.
@@ -288,12 +302,29 @@ class ShadeMasterState extends State<ShadeMaster> {
       );
       if (!mounted) return;
       setState(() => _isAnalyzing = false);
-      await showResultsDialog(context, results);
+      final createOrder = await showResultsDialog(context, results, canCreateOrder: widget.onCreateOrder != null);
+      if (createOrder == true && mounted) await _createOrder(pixels, results);
     } on AnalysisException catch (e) {
       if (!mounted) return;
       setState(() => _isAnalyzing = false);
       final message = analysisProblemMessage(AppLocalizations.of(context), e.problem);
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    }
+  }
+
+  Future<void> _nameShade(Region region, int index) async {
+    final choice = await showShadeNamePicker(context, letter: intToLetter(index + 1), current: region.shadeName);
+    if (choice == null || !mounted) return;
+    setState(() => region.shadeName = choice.name);
+  }
+
+  Future<void> _createOrder(Unit8Img pixels, AnalysisResult results) async {
+    setState(() => _isAnalyzing = true);
+    try {
+      final jpeg = await renderAnnotatedJpeg(pixels, _allRegions[0], _allRegions[1]);
+      await widget.onCreateOrder!(results, jpeg);
+    } finally {
+      if (mounted) setState(() => _isAnalyzing = false);
     }
   }
 }

@@ -32,7 +32,8 @@ class OrderRepository {
     return orders;
   }
 
-  Future<void> save(LabOrder order, {Uint8List? photoJpeg}) async {
+  /// Saves [order] (and [photoJpeg] when given) and returns it as stored.
+  Future<LabOrder> save(LabOrder order, {Uint8List? photoJpeg}) async {
     await _folder(order.id).create(recursive: true);
     if (photoJpeg != null) await photoFile(order.id).writeAsBytes(photoJpeg, flush: true);
     final saved = order.copyWith(hasPhoto: order.hasPhoto && await photoFile(order.id).exists());
@@ -40,6 +41,7 @@ class OrderRepository {
     final temporary = File('${_orderFile(order.id).path}.tmp');
     await temporary.writeAsString(const JsonEncoder.withIndent('  ').convert(saved.toJson()), flush: true);
     await temporary.rename(_orderFile(order.id).path);
+    return saved;
   }
 
   Future<Uint8List?> loadPhoto(LabOrder order) async {

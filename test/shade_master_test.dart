@@ -1,9 +1,11 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
+import 'package:shadesmaster/analysis/analyze.dart';
 import 'package:shadesmaster/widget_shade_master.dart';
 
 import 'support/test_app.dart';
@@ -73,5 +75,50 @@ void main() {
     final winnerTile = find.ancestor(of: find.text('Winner'), matching: find.byType(ListTile));
     expect(find.descendant(of: winnerTile, matching: find.text('Shade B')), findsOneWidget);
     expect(find.textContaining('Excellent match'), findsOneWidget);
+  });
+
+  testWidgets('a shade named from the guide is reported by name and can start a lab order', (tester) async {
+    tester.view.physicalSize = const Size(400, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    AnalysisResult? orderedFrom;
+    Uint8List? orderPhoto;
+    await tester.pumpWidget(testApp(Scaffold(
+      body: ShadeMaster(
+        img: XFile(writeDemoPhoto().path),
+        onClose: () {},
+        onCreateOrder: (result, jpeg) async {
+          orderedFrom = result;
+          orderPhoto = jpeg;
+        },
+      ),
+    )));
+    await waitUntil(tester, () => find.byType(CircularProgressIndicator).evaluate().isEmpty);
+
+    await tester.tap(find.text('Draw Teeth'));
+    await tester.pump();
+    await drawLoop(
+        tester, const [Offset(90, 215), Offset(180, 215), Offset(180, 320), Offset(90, 320), Offset(90, 222)]);
+    await tester.tap(find.text('Draw Shades'));
+    await tester.pump();
+    await drawLoop(
+        tester, const [Offset(250, 478), Offset(312, 478), Offset(312, 562), Offset(250, 562), Offset(250, 484)]);
+
+    await tester.tap(find.text('Shade A'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('A2'));
+    await tester.pumpAndSettle();
+    expect(find.text('Shade A2'), findsOneWidget);
+
+    await tester.tap(find.text('Start Analyze'));
+    await waitUntil(tester, () => find.text('Winner').evaluate().isNotEmpty);
+    expect(find.text('Shade A2'), findsWidgets);
+
+    await tester.tap(find.text('Create lab order'));
+    await waitUntil(tester, () => orderPhoto != null);
+    expect(orderedFrom!.winner.name, 'A2');
+    // A JPEG starts with FF D8.
+    expect(orderPhoto!.sublist(0, 2), [0xFF, 0xD8]);
   });
 }

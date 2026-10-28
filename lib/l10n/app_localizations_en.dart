@@ -349,6 +349,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pdfPhoto => 'Photo with the analysed areas';
 
   @override
+  String get patient => 'Patient';
+
+  @override
+  String get pdfTooth => 'Tooth';
+
+  @override
   String get pdfShade => 'Shade';
 
   @override

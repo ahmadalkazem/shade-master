@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:shadesmaster/drawings.dart';
 import 'package:shadesmaster/utils/image_fit.dart';
@@ -21,8 +23,12 @@ class SelectionPainter extends CustomPainter {
   final SelectionType activeType;
   final Size imageSize;
 
-  /// Multiplies the label size and the dot radius, e.g. for full resolution exports.
+  /// Multiplies the label size, line width and dot radius, e.g. for full resolution exports.
   final double scale;
+
+  /// Draws only the outline of the regions, so the colors inside stay
+  /// visible (used for the photo sent to the laboratory).
+  final bool outlined;
 
   SelectionPainter({
     required this.teethRegions,
@@ -31,6 +37,7 @@ class SelectionPainter extends CustomPainter {
     required this.activeType,
     required this.imageSize,
     this.scale = 1,
+    this.outlined = false,
   });
 
   @override
@@ -38,12 +45,14 @@ class SelectionPainter extends CustomPainter {
     final fit = ImageFit(imageSize, size);
 
     final paintTeeth = Paint()
-      ..color = teethColor.withValues(alpha: 0.4)
-      ..style = PaintingStyle.fill;
+      ..color = outlined ? teethColor.shade700 : teethColor.withValues(alpha: 0.4)
+      ..style = outlined ? PaintingStyle.stroke : PaintingStyle.fill
+      ..strokeWidth = 3 * scale;
 
     final paintShades = Paint()
-      ..color = shadesColor.withValues(alpha: 0.4)
-      ..style = PaintingStyle.fill;
+      ..color = outlined ? shadesColor : shadesColor.withValues(alpha: 0.4)
+      ..style = outlined ? PaintingStyle.stroke : PaintingStyle.fill
+      ..strokeWidth = 3 * scale;
 
     // Draw teeth regions with numbers
     for (int i = 0; i < teethRegions.length; i++) {
@@ -70,13 +79,23 @@ class SelectionPainter extends CustomPainter {
     if (region.points.isEmpty) return;
     final path = Path()..addPolygon(region.points.map(fit.imageToBox).toList(), true);
     canvas.drawPath(path, paint);
-    _drawText(canvas, label, fit.imageToBox(region.centroid));
+    // On an outline the label goes above the region, so it hides no color.
+    final bounds = path.getBounds();
+    final anchor = outlined
+        ? Offset(bounds.center.dx, math.max(bounds.top - 16 * scale, 14 * scale))
+        : fit.imageToBox(region.centroid);
+    _drawText(canvas, label, anchor);
   }
 
   void _drawText(Canvas canvas, String text, Offset position) {
     final textSpan = TextSpan(
       text: text,
-      style: TextStyle(color: Colors.black, fontSize: 20 * scale, fontWeight: FontWeight.bold),
+      style: TextStyle(
+        color: Colors.black,
+        fontSize: 20 * scale,
+        fontWeight: FontWeight.bold,
+        backgroundColor: outlined ? Colors.white.withValues(alpha: 0.8) : null,
+      ),
     );
     final textPainter = TextPainter(
       text: textSpan,

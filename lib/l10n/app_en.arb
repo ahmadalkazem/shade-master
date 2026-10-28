@@ -123,6 +123,8 @@
   "pdfOrderNumber": "Order no.",
   "pdfDate": "Date",
   "pdfPhoto": "Photo with the analysed areas",
+  "patient": "Patient",
+  "pdfTooth": "Tooth",
   "pdfShade": "Shade",
   "pdfAssessment": "Assessment",
   "pdfDisclaimer": "The shade analysis is an estimate from a photo. Confirm the shade visually under standard lighting.",

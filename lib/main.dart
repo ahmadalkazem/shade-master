@@ -16,6 +16,7 @@ import 'package:shadesmaster/widget_shade_master.dart';
 import 'package:shadesmaster/widget_primary_button.dart';
 
 const appVersion = '1.0.0';
+const appFontFamily = 'IBMPlexSansArabic';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,6 +35,15 @@ void registerFontLicenses() {
     );
     yield LicenseEntryWithLineBreaks(['Noto Sans'], await rootBundle.loadString('assets/fonts/NotoSans-LICENSE.txt'));
   });
+}
+
+ThemeData buildAppTheme() {
+  return ThemeData(
+    colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF0078D4)),
+    fontFamily: appFontFamily,
+    fontFamilyFallback: const ['NotoSansDelta'],
+    useMaterial3: true,
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -55,11 +65,7 @@ class MyApp extends StatelessWidget {
           locale: settings.locale,
           supportedLocales: AppLocalizations.supportedLocales,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
-          theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF0078D4)),
-            fontFamily: 'IBMPlexSansArabic',
-            useMaterial3: true,
-          ),
+          theme: buildAppTheme(),
           home: const MainPage(),
         ),
       ),

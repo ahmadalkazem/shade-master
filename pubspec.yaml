@@ -29,10 +29,18 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^5.0.0
 
+# Regenerate with: dart run flutter_launcher_icons (sources in assets/icon, drawn from app_icon.svg)
 flutter_launcher_icons:
   android: true
   ios: true
   image_path: "assets/icon/app_icon.png"
+  image_path_ios: "assets/icon/app_icon_ios.png"
+  remove_alpha_ios: true
+  adaptive_icon_background: "#0B7FB5"
+  adaptive_icon_foreground: "assets/icon/app_icon_foreground.png"
+  # The foreground already keeps the artwork inside the safe zone.
+  adaptive_icon_foreground_inset: 0
+  min_sdk_android: 24
 
 flutter:
   uses-material-design: true
@@ -40,7 +48,6 @@ flutter:
   assets:
     - assets/icon/app_icon.png
     - assets/fonts/IBMPlexSansArabic-LICENSE.txt
-    - assets/fonts/NotoSans-Delta.ttf
     - assets/fonts/NotoSans-LICENSE.txt
   fonts:
     - family: IBMPlexSansArabic
@@ -48,3 +55,7 @@ flutter:
         - asset: assets/fonts/IBMPlexSansArabic-Regular.ttf
         - asset: assets/fonts/IBMPlexSansArabic-Bold.ttf
           weight: 700
+    # Only the Greek capital delta, for "ΔE00" (IBM Plex Sans Arabic has no Greek).
+    - family: NotoSansDelta
+      fonts:
+        - asset: assets/fonts/NotoSans-Delta.ttf

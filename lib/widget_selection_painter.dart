@@ -92,6 +92,7 @@ class SelectionPainter extends CustomPainter {
       text: text,
       style: TextStyle(
         color: Colors.black,
+        fontFamily: 'IBMPlexSansArabic',
         fontSize: 20 * scale,
         fontWeight: FontWeight.bold,
         backgroundColor: outlined ? Colors.white.withValues(alpha: 0.8) : null,

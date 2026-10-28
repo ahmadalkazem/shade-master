@@ -48,6 +48,8 @@ class _SettingsPageState extends State<SettingsPage> {
         child: TextField(
           controller: controller,
           keyboardType: keyboardType,
+          // Phone numbers read left to right in Arabic too.
+          textDirection: keyboardType == TextInputType.phone ? TextDirection.ltr : null,
           decoration: InputDecoration(labelText: label, border: const OutlineInputBorder()),
           onChanged: (_) => _saveDefaults(),
         ),

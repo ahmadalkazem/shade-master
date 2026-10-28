@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shadesmaster/app/app_scope.dart';
 import 'package:shadesmaster/app/app_settings.dart';
 import 'package:shadesmaster/l10n/app_localizations.dart';
+import 'package:shadesmaster/main.dart';
 import 'package:shadesmaster/orders/order_repository.dart';
 
 /// A fresh temporary folder for settings and orders.
@@ -18,6 +19,8 @@ Widget testApp(Widget child, {String language = 'en', AppSettings? settings, Ord
     settings: appSettings,
     orders: orders ?? OrderRepository(tempStorage()),
     child: MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: buildAppTheme(),
       locale: appSettings.locale,
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -32,6 +35,7 @@ Future<void> loadAppFonts() async {
     ..addFont(rootBundle.load('assets/fonts/IBMPlexSansArabic-Regular.ttf'))
     ..addFont(rootBundle.load('assets/fonts/IBMPlexSansArabic-Bold.ttf'));
   await loader.load();
+  await (FontLoader('NotoSansDelta')..addFont(rootBundle.load('assets/fonts/NotoSans-Delta.ttf'))).load();
 }
 
 AppLocalizations l10nOf(WidgetTester tester, Type widgetType) =>

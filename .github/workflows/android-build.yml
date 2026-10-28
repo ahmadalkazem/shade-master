@@ -43,7 +43,7 @@ jobs:
       - run: flutter --version
       - run: flutter pub get --enforce-lockfile
       - run: flutter analyze
-      - run: dart format --output=none --set-exit-if-changed lib test
+      - run: dart format --output=none --set-exit-if-changed lib test tool
       - run: flutter test
 
       - name: Configure release signing
@@ -71,6 +71,7 @@ jobs:
           build_tools="$(ls -d "$ANDROID_HOME"/build-tools/*/ | sort -V | tail -1)"
           ls -l "$apk" build/app/outputs/bundle/release/app-release.aab
           "${build_tools}aapt2" dump badging "$apk" | grep -E "^(package|minSdkVersion|sdkVersion|targetSdkVersion|application-label|native-code)"
+          "${build_tools}aapt2" dump permissions "$apk"
           # minSdk 24 means v2+ signatures only, which keytool cannot read.
           "${build_tools}apksigner" verify --print-certs "$apk" | grep -E "certificate (DN|SHA-256)"
           unzip -v "$apk" "lib/*"

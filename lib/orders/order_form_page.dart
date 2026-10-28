@@ -139,6 +139,8 @@ class _OrderFormPageState extends State<OrderFormPage> {
         child: TextFormField(
           controller: controller,
           keyboardType: keyboardType,
+          // Phone numbers read left to right in Arabic too.
+          textDirection: keyboardType == TextInputType.phone ? TextDirection.ltr : null,
           maxLines: maxLines,
           decoration: InputDecoration(labelText: label, helperText: helper, border: const OutlineInputBorder()),
           validator: required ? (value) => (value ?? '').trim().isEmpty ? l10n.required : null : null,

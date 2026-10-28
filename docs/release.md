@@ -38,6 +38,12 @@ build/app/outputs/bundle/release/app-release.aab
 build/app/outputs/flutter-apk/app-release.apk
 ```
 
+ملف `APK` الشامل يقارب 60 ميغابايت لأنه يحمل مكتبات ثلاثة معالجات بلا ضغط. `Google Play` يرسل من ملف `AAB` الجزء المناسب لكل جهاز فقط. للتوزيع المباشر يمكن بناء ملف لكل معالج، ومعظم الهواتف الحديثة تحتاج ملف `arm64-v8a`:
+
+```bash
+flutter build apk --release --split-per-abi
+```
+
 ## 3. البناء على GitHub Actions
 
 سير العمل `.github/workflows/android-build.yml` يبني الملفين عند كل دفع. ليوقّعهما بمفتاحك أضف أربعة أسرار في إعدادات المستودع ضمن `Settings` ثم `Secrets and variables` ثم `Actions`:

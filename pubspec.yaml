@@ -28,6 +28,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+  image_picker_platform_interface: ^2.11.2
 
 # Regenerate with: dart run flutter_launcher_icons (sources in assets/icon, drawn from app_icon.svg)
 flutter_launcher_icons:

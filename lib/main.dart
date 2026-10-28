@@ -112,55 +112,63 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return Scaffold(
-      appBar: imgPicked != null
-          ? null
-          : AppBar(
-              title: Text(l10n.appTitle),
-              actions: [
-                IconButton(
-                  tooltip: l10n.labOrders,
-                  icon: const Icon(Icons.assignment_outlined),
-                  onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const OrdersPage())),
-                ),
-                IconButton(
-                  tooltip: l10n.settings,
-                  icon: const Icon(Icons.settings_outlined),
-                  onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const SettingsPage())),
-                ),
-              ],
-            ),
-      body: Center(
-        child: imgPicked != null
-            ? ShadeMaster(
-                img: imgPicked!,
-                onClose: closeImage,
-                onCreateOrder: createOrder,
-              )
-            : SingleChildScrollView(
-                padding: EdgeInsets.all(12),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(l10n.homeHeadline, style: TextStyle(fontSize: 20), textAlign: TextAlign.center),
-                    SizedBox(height: 10),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(16), // adjust the radius
-                      child: Image.asset(
-                        'assets/icon/app_icon.png',
-                        width: 200,
-                        height: 200,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    buildPickerButtons(l10n),
-                    SizedBox(height: 25),
-                    Text(l10n.appVersion(appVersion), style: TextStyle(fontSize: 11)),
-                    Text(l10n.basedOn, style: TextStyle(fontSize: 11), textAlign: TextAlign.center),
-                  ],
-                ),
+    // The Android back button closes the photo instead of leaving the app.
+    return PopScope(
+      canPop: imgPicked == null,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) closeImage();
+      },
+      child: Scaffold(
+        appBar: imgPicked != null
+            ? null
+            : AppBar(
+                title: Text(l10n.appTitle),
+                actions: [
+                  IconButton(
+                    tooltip: l10n.labOrders,
+                    icon: const Icon(Icons.assignment_outlined),
+                    onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const OrdersPage())),
+                  ),
+                  IconButton(
+                    tooltip: l10n.settings,
+                    icon: const Icon(Icons.settings_outlined),
+                    onPressed: () =>
+                        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const SettingsPage())),
+                  ),
+                ],
               ),
+        body: Center(
+          child: imgPicked != null
+              ? ShadeMaster(
+                  img: imgPicked!,
+                  onClose: closeImage,
+                  onCreateOrder: createOrder,
+                )
+              : SingleChildScrollView(
+                  padding: EdgeInsets.all(12),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(l10n.homeHeadline, style: TextStyle(fontSize: 20), textAlign: TextAlign.center),
+                      SizedBox(height: 10),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(16), // adjust the radius
+                        child: Image.asset(
+                          'assets/icon/app_icon.png',
+                          width: 200,
+                          height: 200,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      buildPickerButtons(l10n),
+                      SizedBox(height: 25),
+                      Text(l10n.appVersion(appVersion), style: TextStyle(fontSize: 11)),
+                      Text(l10n.basedOn, style: TextStyle(fontSize: 11), textAlign: TextAlign.center),
+                    ],
+                  ),
+                ),
+        ),
       ),
     );
   }

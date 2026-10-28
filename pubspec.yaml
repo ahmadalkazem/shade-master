@@ -16,7 +16,10 @@ dependencies:
   convex_hull: ^1.1.2
   vector_math: ^2.1.4
   hugeicons: ^0.0.11
-
+  flutter_localizations:
+    sdk: flutter
+  intl: any
+  path_provider: ^2.1.6
 
 dev_dependencies:
   flutter_launcher_icons: ^0.14.3
@@ -31,5 +34,15 @@ flutter_launcher_icons:
 
 flutter:
   uses-material-design: true
+  generate: true
   assets:
     - assets/icon/app_icon.png
+    - assets/fonts/IBMPlexSansArabic-LICENSE.txt
+    - assets/fonts/NotoSans-Delta.ttf
+    - assets/fonts/NotoSans-LICENSE.txt
+  fonts:
+    - family: IBMPlexSansArabic
+      fonts:
+        - asset: assets/fonts/IBMPlexSansArabic-Regular.ttf
+        - asset: assets/fonts/IBMPlexSansArabic-Bold.ttf
+          weight: 700

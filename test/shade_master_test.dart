@@ -6,6 +6,8 @@ import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 import 'package:shadesmaster/widget_shade_master.dart';
 
+import 'support/test_app.dart';
+
 /// Writes a demo photo (no patient data): gum background, one tooth and two
 /// shade tabs, the right one matching the tooth.
 File writeDemoPhoto() {
@@ -47,9 +49,7 @@ void main() {
     addTearDown(tester.view.reset);
 
     final file = writeDemoPhoto();
-    await tester.pumpWidget(MaterialApp(
-      home: Scaffold(body: ShadeMaster(img: XFile(file.path), onClose: () {})),
-    ));
+    await tester.pumpWidget(testApp(Scaffold(body: ShadeMaster(img: XFile(file.path), onClose: () {}))));
     // The 300x400 photo fills the width of the 400x800 screen: 400x533 at y = 133.
     await waitUntil(tester, () => find.byType(CircularProgressIndicator).evaluate().isEmpty);
 

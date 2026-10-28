@@ -1,16 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
+import 'package:shadesmaster/app/app_settings.dart';
 import 'package:shadesmaster/main.dart';
+import 'package:shadesmaster/orders/order_repository.dart';
+
+import 'support/test_app.dart';
 
 void main() {
-  testWidgets('Home screen shows the welcome text and both image sources', (WidgetTester tester) async {
-    await tester.pumpWidget(const MyApp());
+  testWidgets('Home screen is in Arabic and right to left by default', (WidgetTester tester) async {
+    await tester.pumpWidget(MyApp(settings: AppSettings(), orders: OrderRepository(tempStorage())));
 
-    expect(find.text('Welcome to Shade Master'), findsOneWidget);
-    expect(find.text('Use Camera'), findsOneWidget);
-    expect(find.text('Pick Image'), findsOneWidget);
+    expect(find.text('بطاقة لون وطلب مخبري'), findsOneWidget);
+    expect(find.text('الكاميرا'), findsOneWidget);
+    expect(find.text('المعرض'), findsOneWidget);
     expect(find.byIcon(Icons.camera_alt), findsOneWidget);
     expect(find.byIcon(Icons.folder), findsOneWidget);
+    expect(Directionality.of(tester.element(find.text('الكاميرا'))), TextDirection.rtl);
+  });
+
+  testWidgets('Home screen in English keeps the original labels', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MyApp(settings: AppSettings(locale: const Locale('en')), orders: OrderRepository(tempStorage())),
+    );
+
+    expect(find.text('Use Camera'), findsOneWidget);
+    expect(find.text('Pick Image'), findsOneWidget);
+    expect(find.textContaining('Shade Master by Dr. Ali A. Saleem'), findsOneWidget);
+    expect(Directionality.of(tester.element(find.text('Use Camera'))), TextDirection.ltr);
+  });
+
+  testWidgets('Switching the language in the settings is applied to the app', (WidgetTester tester) async {
+    final settings = AppSettings();
+    await tester.pumpWidget(MyApp(settings: settings, orders: OrderRepository(tempStorage())));
+
+    await tester.tap(find.byTooltip('الإعدادات'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('English'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Settings'), findsOneWidget);
+    expect(settings.toJson()['language'], 'en');
   });
 }

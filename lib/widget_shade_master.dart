@@ -5,6 +5,7 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shadesmaster/analysis/analyze.dart';
 import 'package:shadesmaster/drawings.dart';
+import 'package:shadesmaster/l10n/app_localizations.dart';
 import 'package:shadesmaster/utils/image_fit.dart';
 import 'package:shadesmaster/utils/int_to_letter.dart';
 import 'package:shadesmaster/utils/unit_8_img.dart';
@@ -148,6 +149,7 @@ class ShadeMasterState extends State<ShadeMaster> {
   }
 
   Positioned buildToolbar(BoxConstraints constraints) {
+    final l10n = AppLocalizations.of(context);
     return Positioned(
       bottom: 20,
       width: constraints.maxWidth,
@@ -174,6 +176,7 @@ class ShadeMasterState extends State<ShadeMaster> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         IconButton(
+                          tooltip: _showAreas ? l10n.hideAreas : l10n.showAreas,
                           isSelected: !_showAreas,
                           color: Colors.black87,
                           style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.white24)),
@@ -197,8 +200,8 @@ class ShadeMasterState extends State<ShadeMaster> {
                               final int i = _regions.indexOf(e);
                               return Pill(
                                 label: _activeSelecting == SelectionType.teeth
-                                    ? "Tooth ${i + 1}"
-                                    : "Shade ${e.shadeName ?? intToLetter(i + 1)}",
+                                    ? l10n.toothLabel(i + 1)
+                                    : l10n.shadeLabel(e.shadeName ?? intToLetter(i + 1)),
                                 color: _activeSelecting == SelectionType.teeth
                                     ? teethColor.shade100
                                     : shadesColor.shade100,
@@ -222,7 +225,7 @@ class ShadeMasterState extends State<ShadeMaster> {
                       children: [
                         ToolbarButton(
                           icon: HugeIcons.strokeRoundedDentalTooth,
-                          label: "Draw Teeth",
+                          label: l10n.drawTeeth,
                           isActive: _activeSelecting == SelectionType.teeth,
                           onPress: () {
                             setState(() {
@@ -235,7 +238,7 @@ class ShadeMasterState extends State<ShadeMaster> {
                         ),
                         ToolbarButton(
                           icon: HugeIcons.strokeRoundedPinLocation02,
-                          label: "Draw Shades",
+                          label: l10n.drawShades,
                           isActive: _activeSelecting == SelectionType.shades,
                           onPress: () {
                             setState(() {
@@ -249,14 +252,14 @@ class ShadeMasterState extends State<ShadeMaster> {
                         if (_allRegions[0].isNotEmpty && _allRegions[1].isNotEmpty)
                           ToolbarButton(
                             icon: HugeIcons.strokeRoundedMarketAnalysis,
-                            label: "Start Analyze",
+                            label: l10n.startAnalyze,
                             isActive: false,
                             onPress: _analyze,
                             activeColor: Colors.orange,
                           ),
                         ToolbarButton(
                           icon: HugeIcons.strokeRoundedLogout02,
-                          label: "Close image",
+                          label: l10n.closeImage,
                           isActive: false,
                           onPress: widget.onClose,
                         ),
@@ -289,7 +292,8 @@ class ShadeMasterState extends State<ShadeMaster> {
     } on AnalysisException catch (e) {
       if (!mounted) return;
       setState(() => _isAnalyzing = false);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(analysisProblemMessage(e.problem))));
+      final message = analysisProblemMessage(AppLocalizations.of(context), e.problem);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
     }
   }
 }
